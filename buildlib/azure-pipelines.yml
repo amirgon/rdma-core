@@ -22,23 +22,27 @@ pr:
 resources:
   containers:
     - container: azp
-      image: ucfconsort.azurecr.io/rdma-core/azure_pipelines:25.0
-      endpoint: ucfconsort_registry
-    - container: centos6
-      image: ucfconsort.azurecr.io/rdma-core/centos6:25.0
-      endpoint: ucfconsort_registry
-    - container: centos7
-      image: ucfconsort.azurecr.io/rdma-core/centos7:25.0
-      endpoint: ucfconsort_registry
-    - container: centos8
-      image: ucfconsort.azurecr.io/rdma-core/centos8:25.0
-      endpoint: ucfconsort_registry
+      image: amirgon/rdma-core:azp-25
     - container: fedora
-      image: ucfconsort.azurecr.io/rdma-core/fc31:25.0
-      endpoint: ucfconsort_registry
-    - container: leap
-      image: ucfconsort.azurecr.io/rdma-core/opensuse-15.0:25.0
-      endpoint: ucfconsort_registry
+      image: amirgon/rdma-core:fedora-31
+#   - container: azp
+#     image: ucfconsort.azurecr.io/rdma-core/azure_pipelines:25.0
+#     endpoint: ucfconsort_registry
+#   - container: centos6
+#     image: ucfconsort.azurecr.io/rdma-core/centos6:25.0
+#     endpoint: ucfconsort_registry
+#   - container: centos7
+#     image: ucfconsort.azurecr.io/rdma-core/centos7:25.0
+#     endpoint: ucfconsort_registry
+#   - container: centos8
+#     image: ucfconsort.azurecr.io/rdma-core/centos8:25.0
+#     endpoint: ucfconsort_registry
+#   - container: fedora
+#     image: ucfconsort.azurecr.io/rdma-core/fc31:25.0
+#     endpoint: ucfconsort_registry
+#   - container: leap
+#     image: ucfconsort.azurecr.io/rdma-core/opensuse-15.0:25.0
+#     endpoint: ucfconsort_registry
 
 stages:
   - stage: Build
@@ -107,21 +111,21 @@ stages:
               mv ../util/udma_barrier.h.old ../util/udma_barrier.h
             displayName: Simulate non-coherent DMA Platform Compile
 
-          - bash: |
-              set -e
-              mkdir build-arm64
-              cd build-arm64
-              CC=aarch64-linux-gnu-gcc-8 cmake -GNinja .. -DIOCTL_MODE=both -DNO_PYVERBS=1 -DENABLE_WERROR=1
-              ninja
-            displayName: gcc 8.3 ARM64 Compile
+#         - bash: |
+#             set -e
+#             mkdir build-arm64
+#             cd build-arm64
+#             CC=aarch64-linux-gnu-gcc-8 cmake -GNinja .. -DIOCTL_MODE=both -DNO_PYVERBS=1 -DENABLE_WERROR=1
+#             ninja
+#           displayName: gcc 8.3 ARM64 Compile
 
-          - bash: |
-              set -e
-              mkdir build-ppc64el
-              cd build-ppc64el
-              CC=powerpc64le-linux-gnu-gcc-8 cmake -GNinja .. -DIOCTL_MODE=both -DNO_PYVERBS=1 -DENABLE_WERROR=1
-              ninja
-            displayName: gcc 8.3 PPC64EL Compile
+#         - bash: |
+#             set -e
+#             mkdir build-ppc64el
+#             cd build-ppc64el
+#             CC=powerpc64le-linux-gnu-gcc-8 cmake -GNinja .. -DIOCTL_MODE=both -DNO_PYVERBS=1 -DENABLE_WERROR=1
+#             ninja
+#           displayName: gcc 8.3 PPC64EL Compile
 
           - bash: |
               set -e
@@ -170,26 +174,26 @@ stages:
           vmImage: 'Ubuntu-16.04'
         strategy:
           matrix:
-            centos6:
-              CONTAINER: centos6
-              SPEC: buildlib/centos6.spec
-              RPMBUILD_OPTS:
-            centos7:
-              CONTAINER: centos7
-              SPEC: redhat/rdma-core.spec
-              RPMBUILD_OPTS:  --define 'EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_WERROR=1'
-            centos8:
-              CONTAINER: centos8
-              SPEC: redhat/rdma-core.spec
-              RPMBUILD_OPTS:  --define 'EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_WERROR=1'
+#           centos6:
+#             CONTAINER: centos6
+#             SPEC: buildlib/centos6.spec
+#             RPMBUILD_OPTS:
+#           centos7:
+#             CONTAINER: centos7
+#             SPEC: redhat/rdma-core.spec
+#             RPMBUILD_OPTS:  --define 'EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_WERROR=1'
+#           centos8:
+#             CONTAINER: centos8
+#             SPEC: redhat/rdma-core.spec
+#             RPMBUILD_OPTS:  --define 'EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_WERROR=1'
             fedora31:
               CONTAINER: fedora
               SPEC: redhat/rdma-core.spec
               RPMBUILD_OPTS:  --define 'EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_WERROR=1'
-            leap:
-              CONTAINER: leap
-              SPEC: suse/rdma-core.spec
-              RPMBUILD_OPTS:  --define 'EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_WERROR=1' --without=curlmini
+#           leap:
+#             CONTAINER: leap
+#             SPEC: suse/rdma-core.spec
+#             RPMBUILD_OPTS:  --define 'EXTRA_CMAKE_FLAGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_WERROR=1' --without=curlmini
         container: $[ variables['CONTAINER'] ]
         steps:
           - checkout: none
